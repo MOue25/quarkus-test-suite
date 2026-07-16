@@ -1,12 +1,71 @@
-
 # Quarkus Test Suite
 
-Test Suite for Quarkus integration scenarios. Among the standard Quarkus test features, scenarios hardly rely on [Quarkus-test-framework](https://github.com/quarkus-qe/quarkus-test-framework) features
+<p align="center">
+    <a href="https://github.com/quarkus-qe/quarkus-test-suite/graphs/contributors" alt="Contributors">
+        <img src="https://img.shields.io/github/contributors/quarkus-qe/quarkus-test-suite"/></a>
+    <a href="https://github.com/quarkus-qe/quarkus-test-suite/pulse" alt="Activity">
+        <img src="https://img.shields.io/github/commit-activity/m/quarkus-qe/quarkus-test-suite"/></a>
+    <a href="https://github.com/quarkus-qe/quarkus-test-suite/actions/workflows/daily.yaml" alt="Build Status">
+        <img src="https://github.com/quarkus-qe/quarkus-test-suite/actions/workflows/daily.yaml/badge.svg"></a>
+    <a href="https://github.com/quarkus-qe/quarkus-test-suite" alt="Top Language">
+        <img src="https://img.shields.io/github/languages/top/quarkus-qe/quarkus-test-suite"></a>
+</p>
+
+Test Suite for Quarkus integration scenarios. Among the standard Quarkus test features, scenarios rely heavily on 
+[Quarkus-test-framework](https://github.com/quarkus-qe/quarkus-test-framework) features.
 
 The test suite includes:
 - Bare metal scenario testing
 - OpenShift scenario testing
 - Native testing
+
+## Getting Started for Developers
+
+### Prerequisites
+- Container runtime (Podman or Docker)
+- JDK 17+
+- Apache Maven 3.9+
+
+### The Quarkus QE Test Framework
+
+To verify integration scenarios across Quarkus LTS streams, this suite is built on the 
+[Quarkus QE Test Framework](https://github.com/quarkus-qe/quarkus-test-framework) — a Quarkus 
+JUnit extension that lets a single test be run across multiple deployment targets:
+
+- **JVM** — the app runs as a plain Quarkus JVM process
+- **Native** — the same scenario runs against a natively compiled executable
+- **OpenShift / Kubernetes** — the app is deployed to a cluster and exercised there
+
+The framework is consumed as ordinary Maven dependencies, pinned to a single version by the
+`quarkus.qe.framework.version` property in the root `pom.xml`. Those artifacts must be resolvable
+when the build runs — either built locally into your Maven local repository, or pulled from a remote
+repository:
+
+- **Released versions** live on Maven Central and are used mainly on branches that test a specific
+  Quarkus LTS stream.
+
+- **`999-SNAPSHOT`** is the in development version `main` builds against. It is deployed daily to the
+  Sonatype snapshot repository, so it resolves automatically with no local setup, this is what most
+  contributors use.
+
+To build against a different framework version, override the property:
+
+```shell
+mvn clean verify -Dquarkus.qe.framework.version=${FRAMEWORK_VERSION}
+```
+
+To build the framework locally instead, follow the framework repo's
+[contributing guide](https://github.com/quarkus-qe/quarkus-test-framework/blob/main/CONTRIBUTING.md).
+
+### Learning Resources
+
+- [Quarkus Test Framework README](https://github.com/quarkus-qe/quarkus-test-framework#readme)
+- [Quarkus Test Framework Wiki](https://github.com/quarkus-qe/quarkus-test-framework/wiki)
+- Framework [`examples/`](https://github.com/quarkus-qe/quarkus-test-framework/tree/main/examples):
+  runnable projects showing Quarkus integrated with the managed services the framework provides
+  databases, OIDC, messaging providers and others across the supported platforms, along with
+  tooling such as the Quarkus CLI and the various ways to deploy on OpenShift. See the examples
+  folder and the wiki for details.
 
 ## How-to run Quarkus test suite
 
@@ -16,7 +75,8 @@ Docker, JDK 17+, and Apache Maven 3.8 are the base requirements to run the test 
 
 Refer to [prerequisites](#Prerequisites) section for more details about the tooling.
 
-Maven commands can be executed from the root directory or from the sub-modules. Additionally, if you want to run a single scenario you can use `-Dit.test=<TEST_CLASS_NAME>` flag.
+Maven commands can be executed from the root directory or from the sub-modules. Additionally, if you want to run a 
+single scenario you can use `-Dit.test=<TEST_CLASS_NAME>` flag.
 
 Let's say that we want to only test `HttpMinimumIT` located over `http/http-minimum` module
 
@@ -58,7 +118,7 @@ If you have a look the main `pom.xml` you will notice that there are several pro
 * spring-modules: is focus on Spring world
 * quarkus-cli-tests: enable Quarkus command client test
 * ai-modules: extensions, related to Quarkus AI (Langchain4j)
-* ai-tests: enables tests for Quarkus AI, requires option `quarkus.langchain4j.openai.api-key`. Beware, that each run costs us some money. 
+* ai-tests: enables tests for Quarkus AI, requires option `quarkus.langchain4j.openai.api-key`. Beware, that each run costs us some money.
 
 By default, all your tests are running on bare metal (JVM / Dev mode), but you can add the following profiles to your maven command in order to activate other platforms
 
@@ -120,7 +180,7 @@ To run test services on OpenShift clusters installed on aarch64, make sure you e
 mvn clean verify -Dall-modules -Dopenshift -Daarch64 -pl http/http-minimum
 ```
 
-**NOTE:** You can comine this with native profile also.
+**NOTE:** You can combine this with native profile also.
 
 ### OpenShift & Native
 
@@ -133,7 +193,7 @@ You have a choice of using locally installed GraalVM or a Docker base image in o
 
 **Example:**
 
-User: `Deploy in Openshift and run http-minimum module in native mode.`
+User: `Deploy in OpenShift and run http-minimum module in native mode.`
 
 ```shell
 mvn clean verify -Dall-modules -Dnative -Dopenshift -pl http/http-minimum
@@ -186,8 +246,7 @@ mvn clean verify -Dall-modules -pl http/http-minimum
 
 #### Bare metal & Aarch64
 
-To run tests on bare metal aarch64, make sure you enable aarch64 profile so that tests are able to launch test service 
-containers:
+To run tests on bare metal aarch64, make sure you enable aarch64 profile so that tests are able to launch test service containers:
 
 ```shell
 mvn clean verify -Dall-modules -Daarch64 -pl http/http-minimum
@@ -270,7 +329,7 @@ These requirements are necessary to verify the tests using Operators.
 The suite uses `org.junit.jupiter.api.Tag` annotation to group similar tests together. They can be enabled/disabled with standard Maven options `groups` and `excludedGroups` (see https://maven.apache.org/surefire/maven-surefire-plugin/test-mojo.html). Aside from specific use-cases (eg `@Tag("QUARKUS-1547")`), there are several common groups used through the test suite:
 - `fips-incompatible`: tests, which broke when running on FIPS 140-2 compliant hosts
 - `use-quarkus-openshift-extension`: tests use `quarkus-openshift` extension to deploy the app
-- `serverless`: use Openshift Serverless to deploy the app
+- `serverless`: use OpenShift Serverless to deploy the app
 - `quarkus-cli`: tests use Quarkus CLI, which needs to be installed ( see https://quarkus.io/guides/cli-tooling for details)
 - `podman-incompatible`: tests, which require Docker as a container engine and are not compatible with Podman.
 - `long-running`: tests, which run for a long time and therefore are disabled in PR CI
@@ -300,7 +359,7 @@ mvn -fae clean verify \
 ## GH Actions caching maven repository
 
 This repository using GH cache to save and restore Quarkus 999-SNAPSHOT build.
-The save of cache happening every nigh at the start of [Daily Build](https://github.com/quarkus-qe/quarkus-test-suite/actions/workflows/daily.yaml).
+The save of cache happening every night at the start of [Daily Build](https://github.com/quarkus-qe/quarkus-test-suite/actions/workflows/daily.yaml).
 The saved cache is later restored in followup jobs to test Quarkus.
 The saved cache is also restored in PRs runs to speed the test execution removing need to build Quarkus 999-SNAPSHOT every time.
 
@@ -328,7 +387,7 @@ When creating new branch please ensure following items:
 
 ## Test Framework
 
-We use a Quarkus QE Test Framework to verify this test suite. For further information about it, please go to [here](https://github.com/quarkus-qe/quarkus-test-framework).
+We use a Quarkus QE Test Framework to verify this test suite. For further information about it, please go to [here](https://github.com/quarkus-qe/quarkus-test-framework). See the [Getting Started for Developers](#getting-started-for-developers) section above for setup instructions and starter examples.
 
 ## Name Convention
 
@@ -414,17 +473,17 @@ This module will setup a very minimal configuration (only `quarkus-resteasy`) an
 Reactive equivalent of the http/rest-client module.
 Exclusions: XML test. Reason: https://quarkus.io/blog/resteasy-reactive/#what-jax-rs-features-are-missing
 
-There are also several scenarios, not covered in resteasy module: 
+There are also several scenarios, not covered in resteasy module:
 1. Endpoints to check usage of HTTP/2 using REST client over the http and https.
 HTTP/2 REST client tests check sync and async response by:
 - Two endpoint used by client
 - Eight endpoints used for validation of client request
-2. Reflection-free serialization and deserialization (enabled with special option) and a test to verify that this feature is really enabled. 
+2. Reflection-free serialization and deserialization (enabled with special option) and a test to verify that this feature is really enabled.
 
 
 ### `http/rest-client-reactive-vanilla`
 Verifies Rest Client usage, while no request are going only internally on the server.
-This module requires to not have any resteasy dependency, for an issue to be reproducible. 
+This module requires to not have any resteasy dependency, for an issue to be reproducible.
 
 ### `http/hibernate-validator`
 Verifies HTTP endpoints validation using `quarkus-hibernate-validator` works correctly in Resteasy Classic and Resteasy Reactive.
@@ -515,7 +574,7 @@ Also ensures maven profile activation with properties and additional repository 
 ### `properties`
 
 Module that covers the runtime configuration to ensure the changes take effect. The configuration that is covered is:
-- Allow disabling/enabling `Swagger/GraphQL/Heatlh/OpenAPI` endpoints on DEV, JVM and Native modes
+- Allow disabling/enabling `Swagger/GraphQL/Health/OpenAPI` endpoints on DEV, JVM and Native modes
 - Properties from YAML and external files
 - Properties from Consul
 
@@ -532,7 +591,7 @@ Module that covers the logging functionality using JBoss Logging Manager. The fo
 - Inject a `Logger` instance using a custom category
 - Setting up the log level property for logger instances
 - Check default `quarkus.log.min-level` value
-- 
+
 ### `logging/thirdparty`
 
 Module that covers, that logging works with various third-party solutions. The following scenarios are covered:
@@ -559,8 +618,8 @@ Feature covered:
 * Elastic Fulltext Search verification
   * Sorted result test
   * case insensitive test
-* PostgresSQL + native + Openshift
-* Mysql + native + Openshift
+* PostgreSQL + native + OpenShift
+* MySQL + native + OpenShift
 
 ### `sql-db/sql-app`
 
@@ -591,9 +650,8 @@ Container images used in the tests are:
 - Oracle
   - version 23: `gvenzl/oracle-free:23-slim-faststart`
 
-### `sql-db/sql-app-oracle`
-Functionally identical to `sql-db/sql-app`, but using only `quarkus-jdbc-oracle` driver. This is a workaround for the missing native Oracle coverage in `sql-db/sql-app`.
-
+### `sql-db/sql-app-compatibility`
+Functionally identical to `sql-db/sql-app`, but focused on compatibility coverage across driver/version combinations. This module was previously named `sql-db/sql-app-oracle`, if you're looking for Oracle only coverage using `quarkus-jdbc-oracle`, confirm current scope against the module's own `pom.xml` before relying on this description.
 
 ### `hibernate/hibernate-reactive`
 Verifies that the application can work with data persisted in SQL database in reactive manner. Basically, the same as `sql-app`, but reactive.
@@ -641,7 +699,7 @@ PanacheRepositoryResource methods.
 
 - AgroalPoolTest, will cover how the db pool is managed in terms of IDLE-timeout, max connections and concurrency.
 - InitContainer tests, which cover, whether we can use custom init containers
-  - Dockerfile for custom init container can be found inside resources folder 
+  - Dockerfile for custom init container can be found inside resources folder
 
 ### `sql-db/reactive-rest-data-panache`
 
@@ -774,7 +832,7 @@ A simple Keycloak realm with 1 client (protected application), 2 users and 2 rol
 
 ### `security/keycloak-oidc-client-extended`
 
-Extends the previous module `security/keycloak-oidc-client-basis` to cover reactive and RestClient integration.
+Extends the previous module `security/keycloak-oidc-client-basic` to cover reactive and RestClient integration.
 
 Applications:
 - Ping application that will invoke the Pong application using the RestClient and will return the expected "ping pong" output.
@@ -814,7 +872,7 @@ Verifies Dev Mode experience using `quarkus-oidc-client` extension without `quar
 Verifies the logs when using custom and default Keycloak service.
 Verifies that it's possible to get token when using Keycloak Dev service.
 
-### `securty/oidc-client-mutual-tls`
+### `security/oidc-client-mutual-tls`
 
 Verifies OIDC client can be authenticated as part of the `Mutual TLS` (`mTLS`) authentication process
 when OpenID Connect Providers requires so. Keycloak is used as a primary OIDC server and Red Hat SSO
@@ -844,7 +902,7 @@ Tests verifies various combinations of these groups and permissions.
 
 ### `security/https`
 
-Verifies that accessing an HTTPS endpoint is posible.
+Verifies that accessing an HTTPS endpoint is possible.
 Uses a self-signed certificate generated during the build, so that the test is fully self-contained.
 
 This test doesn't run on OpenShift (yet).
@@ -878,7 +936,7 @@ this.router.get("/secured")
 ### `security/webauthn`
 Verifies WebAuthn authentication mechanism.
 
-To test WebAuthn we have set up a reactive Mysql database container.
+To test WebAuthn we have set up a reactive MySQL database container.
 
 However,testing WebAuthn can be challenging because it typically requires a hardware token. To address this,
 we've created 'MyWebAuthnHardware' class to simulate that hardware token.
@@ -894,7 +952,7 @@ Test cases
 * Try to register the same user name.
 * Try to login as the registered user.
 * Try to simulate a register user without the specific webauthn data required (challenge, public key credentials, type, rawId, etc).
-* Check for a failed login attemp with an improperly registered user.
+* Check for a failed login attempt with an improperly registered user.
 
 ### Service-discovery/stork
 
@@ -999,12 +1057,12 @@ Verifies that `Quarkus Kafka Stream` and `Quarkus SmallRye Reactive Messaging` e
 
 There is an EventsProducer that generate login status events every 100ms.
 A Kafka stream called `WindowedLoginDeniedStream`  will aggregate these events in fixed time windows of 3 seconds.
-So if the number of wrong access excess a threshold, then a new alert event is thrown. All aggregated events(not only unauthorized) are persisted.
+So if the number of wrong access exceeds a threshold, then a new alert event is thrown. All aggregated events(not only unauthorized) are persisted.
 
 - Quarkus Grateful Shutdown for Kafka connectors
 
 This scenario covers the fix for [QUARKUS-858](https://issues.redhat.com/browse/QUARKUS-858): Avoid message loss during the graceful shutdown (SIGTERM) of the Kafka connector.
-The test will confirm that no messages are lost when the `grateful-shutdown` is enabled. In the other hand, when this property is disabled, messages might be lost.
+The test will confirm that no messages are lost when the `graceful-shutdown` is enabled. On the other hand, when this property is disabled, messages might be lost.
 
 - Reactive Kafka and Kafka Streams SSL
 - Auto-detect serializers and deserializers for the Reactive Messaging Kafka Connector
@@ -1014,7 +1072,7 @@ Kafka streams pipeline is configured by `quarkus.kafka-streams.ssl` prefix prope
 
 ### `messaging/kafka-confluent-avro-reactive-messaging`
 
-- Verifies that `Quarkus Kafka` + `Apicurio Kakfa Registry`(AVRO) and `Quarkus SmallRye Reactive Messaging` extensions work as expected.
+- Verifies that `Quarkus Kafka` + `Apicurio Kafka Registry`(AVRO) and `Quarkus SmallRye Reactive Messaging` extensions work as expected.
 
 There is an EventsProducer that generate stock prices events every 1s. The events are typed by an AVRO schema.
 A Kafka consumer will read these events serialized by AVRO and change an `status` property to `COMPLETED`.
@@ -1022,7 +1080,7 @@ The streams of completed events will be exposed through an SSE endpoint.
 
 ### `messaging/kafka-strimzi-avro-reactive-messaging`
 
-- Verifies that `Quarkus Kafka` + `Apicurio Kakfa Registry`(AVRO) and `Quarkus SmallRye Reactive Messaging` extensions work as expected.
+- Verifies that `Quarkus Kafka` + `Apicurio Kafka Registry`(AVRO) and `Quarkus SmallRye Reactive Messaging` extensions work as expected.
 
 There is an EventsProducer that generate stock prices events every 1s. The events are typed by an AVRO schema.
 A Kafka consumer will read these events serialized by AVRO and change an `status` property to `COMPLETED`.
@@ -1055,7 +1113,7 @@ This test could be extended with some metric gathering.
 
 ### `external-applications`
 
-External applications need a base image which is used by OpenShift to build the app on. So, one base image needs to be supplied forJVM and Native:
+External applications need a base image which is used by OpenShift to build the app on. So, one base image needs to be supplied for JVM and Native:
 - For JVM: `quarkus.s2i.base-jvm-image`
 - For Native: `quarkus.s2i.base-native-image`
 
@@ -1126,7 +1184,7 @@ Covers two areas related to Spring Web:
   - Custom error handlers.
   - Cooperation with Qute templating engine.
 
-  ### `spring/spring-web-reactive`
+### `spring/spring-web-reactive`
   Covers two areas related to Spring Web Reactive:
   - Proper behavior of SmallRye OpenAPI with Mutiny method signatures - correct content types in OpenAPI endpoint output (`/q/openapi`).
   - Spring Boot Bootstrap application which uses Spring Web Reactive features.
@@ -1157,7 +1215,7 @@ Verifies cache entries serialization, querying and cache eviction.
 - Datagrid operator installed in `datagrid-operator` namespace. This needs cluster-admin rights to install.
 - The operator supports only single-namespace so it has to watch another well-known namespace `datagrid-cluster`.
 This namespace must be created by "qe" user or this user must have access to it because tests are connecting to it.
-- These namespaces should be prepared after the Openshift installation - See [Installing Data Grid Operator](https://access.redhat.com/documentation/en-us/red_hat_data_grid/8.1/html/running_data_grid_on_openshift/installation)
+- These namespaces should be prepared after the OpenShift installation - See [Installing Data Grid Operator](https://access.redhat.com/documentation/en-us/red_hat_data_grid/8.1/html/running_data_grid_on_openshift/installation)
 
 Tests create an Infinispan cluster in the `datagrid-cluster` namespace. Cluster is created before tests by `infinispan_cluster_config.yaml`.
 To allow parallel runs of tests this cluster is renamed for every test run - along with configmap `infinispan-config`. The configmap contains
